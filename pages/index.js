@@ -6,6 +6,31 @@ import React, { useState, useEffect } from "react";
 const MedicationSchedule = () => {
   const [schedule, setSchedule] = useState({});
   const [checkedMeds, setCheckedMeds] = useState({});
+  const [allMedicationsTaken, setAllMedicationsTaken] = useState(false);
+  const [lastCheckedDate, setLastCheckedDate] = useState(
+    new Date().toDateString()
+  );
+
+  const resetSchedule = () => {
+    setCheckedMeds({});
+    setAllMedicationsTaken(false);
+  };
+
+  const checkAllMedicationsTaken = () => {
+    const allTaken = Object.keys(schedule).every((time) => checkedMeds[time]);
+    setAllMedicationsTaken(allTaken);
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      console.log("checking again");
+      const currentDate = new Date().toDateString();
+      if (currentDate !== lastCheckedDate) {
+        resetSchedule();
+        setLastCheckedDate(currentDate);
+      }
+    }
+  };
 
   useEffect(() => {
     const csvData = `Medication,07:00,07:15,07:30,09:15,09:30,11:15,12:15,13:15,15:15,17:15,17:30,19:15,21:15,21:30,23:15,23:30
@@ -35,7 +60,22 @@ const MedicationSchedule = () => {
 
     setSchedule(tempSchedule);
     loadCheckedMedications();
+
+    checkAllMedicationsTaken();
   }, []);
+
+  useEffect(() => {
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    loadCheckedMedications();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    checkAllMedicationsTaken();
+  }, [checkedMeds]);
 
   const toggleGreen = (time) => {
     setCheckedMeds((prev) => {
@@ -62,6 +102,12 @@ const MedicationSchedule = () => {
   return (
     <div className={styles.main}>
       <div className={styles.container}>
+        {allMedicationsTaken && (
+          <div className={styles.successmessage}>
+            Yeay! All medications for today have been taken! The list will reset
+            tomorrow morning.
+          </div>
+        )}
         {Object.keys(schedule)
           .sort()
           .map((time) => (
@@ -75,6 +121,12 @@ const MedicationSchedule = () => {
               {`${time}: ${schedule[time].join(", ")}`}
             </button>
           ))}
+        {allMedicationsTaken && (
+          <div className={styles.successmessage}>
+            Yeay! All medications for today have been taken! The list will reset
+            tomorrow morning.
+          </div>
+        )}
       </div>
     </div>
   );

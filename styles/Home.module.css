@@ -24,6 +24,15 @@
   background-color: lightgreen;
 }
 
+.successmessage {
+  margin-top: 20px;
+  padding: 10px;
+  /* background-color: lightgreen; */
+  color: black;
+  text-align: center;
+  border-radius: 5px;
+}
+
 @media screen and (max-width: 760px) {
   .main {
     padding: 0px;
@@ -31,6 +40,8 @@
   .container {
     max-width: 100%;
     width: calc(100% - 16px);
+    margin-top: 16px;
+    margin-bottom: 64px;
   }
 
   .button {
